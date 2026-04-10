@@ -26,7 +26,10 @@ export function Node2Material({ onComplete, onUpdate, personData, currentData }:
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!file) return alert("请先上传素材图片");
+    if (!file) {
+      console.warn("请先上传素材图片");
+      return;
+    }
     setLoading(true);
     try {
       const prompt = `作为商业美陈艺术总监，对该素材进行“视觉基因提取”。

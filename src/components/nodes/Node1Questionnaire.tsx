@@ -20,7 +20,10 @@ export function Node1Questionnaire({ onComplete, onUpdate, currentData }: { onCo
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (Object.keys(answers).length < 3) return alert("请至少填写三个维度的信息以确保画像精准度。");
+    if (Object.keys(answers).length < 3) {
+      console.warn("请至少填写三个维度的信息以确保画像精准度。");
+      return;
+    }
     setLoading(true);
     try {
       const prompt = `基于以下深度问卷回答，生成一份专业的消费者画像报告。

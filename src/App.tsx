@@ -15,7 +15,7 @@ import { Node56Output } from "@/components/nodes/Node56Output";
 import { PresentationMode } from "@/components/shared/PresentationMode";
 import { getNodeTitle, getPersonaForNode, getTransitionMessage } from "@/lib/workflow-utils";
 import { Card } from "@/components/ui/Card";
-import { generateAIResponse } from "./services/geminiService";
+import { generateAIResponse } from "@/services/geminiService";
 
 export default function App() {
   const [state, setState] = useState<WorkflowState>(INITIAL_STATE);
