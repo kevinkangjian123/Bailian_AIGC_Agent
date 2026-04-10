@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Target, Loader2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Button } from "@/components/ui/Button";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/Card";
 import { generateAIResponse } from "@/services/geminiService";
 import { Node4Data } from "@/types";
 

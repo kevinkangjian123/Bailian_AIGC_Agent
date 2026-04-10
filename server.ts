@@ -24,7 +24,7 @@ async function startServer() {
   const upload = multer({ storage: storage });
 
   // Gemini API Setup
-  const genAI = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
+  const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
 
   // API Routes
   app.get("/api/health", (req, res) => {
@@ -35,9 +35,12 @@ async function startServer() {
   app.post("/api/ai/generate", async (req, res) => {
     try {
       const { model, contents, config } = req.body;
-      const result = await genAI.getGenerativeModel({ model: model || "gemini-3-flash-preview" }).generateContent({ contents, ...config });
-      const response = await result.response;
-      res.json({ text: response.text() });
+      const response = await ai.models.generateContent({ 
+        model: model || "gemini-3-flash-preview", 
+        contents, 
+        config 
+      });
+      res.json({ text: response.text });
     } catch (error: any) {
       console.error("AI Error:", error);
       res.status(500).json({ error: error.message });
@@ -52,7 +55,8 @@ async function startServer() {
       }
       const { prompt, model } = req.body;
       
-      const result = await genAI.getGenerativeModel({ model: model || "gemini-3-flash-preview" }).generateContent({
+      const response = await ai.models.generateContent({
+        model: model || "gemini-3-flash-preview",
         contents: [
           {
             role: "user",
@@ -68,8 +72,7 @@ async function startServer() {
           },
         ],
       });
-      const response = await result.response;
-      res.json({ text: response.text() });
+      res.json({ text: response.text });
     } catch (error: any) {
       console.error("Vision Error:", error);
       res.status(500).json({ error: error.message });

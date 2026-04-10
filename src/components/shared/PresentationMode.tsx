@@ -1,7 +1,7 @@
 import React from "react";
 import { motion } from "motion/react";
 import { X } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/Button";
 
 export function PresentationMode({ context, onClose }: { context: any, onClose: () => void }) {
   return (

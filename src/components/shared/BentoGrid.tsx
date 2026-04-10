@@ -1,7 +1,7 @@
 import React from "react";
 import { motion } from "motion/react";
 import { CheckCircle2 } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { NodeID } from "@/types";
 
 interface BentoGridProps {

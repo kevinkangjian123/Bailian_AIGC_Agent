@@ -1,7 +1,7 @@
 import React from "react";
 import { Menu, X } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
+import { Button } from "@/components/ui/Button";
+import { Progress } from "@/components/ui/Progress";
 import { cn } from "@/lib/utils";
 import { NodeID } from "@/types";
 

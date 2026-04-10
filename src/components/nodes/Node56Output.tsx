@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Sparkles, Image as ImageIcon, Send, Loader2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Button } from "@/components/ui/Button";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/Card";
 import { generateAIResponse } from "@/services/geminiService";
 
 export function Node56Output({ onComplete, onUpdate, context, onShowPresentation }: { onComplete: (data: any) => void, onUpdate: (data: any) => void, context: any, onShowPresentation: () => void }) {

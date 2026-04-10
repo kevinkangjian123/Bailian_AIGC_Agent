@@ -1,8 +1,8 @@
 import React from "react";
 import { motion } from "motion/react";
 import { Sparkles, User, Loader2, Send } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { Button } from "@/components/ui/Button";
+import { ScrollArea } from "@/components/ui/ScrollArea";
 import { cn } from "@/lib/utils";
 
 interface Message {
