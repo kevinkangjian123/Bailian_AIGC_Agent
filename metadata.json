@@ -1,0 +1,7 @@
+{
+  "name": "百联 AI 企划助手",
+  "description": "基于'人-货-场'商业逻辑的 Agentic Workflow 系统，将创意素材转化为专业级商业策展方案。",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
