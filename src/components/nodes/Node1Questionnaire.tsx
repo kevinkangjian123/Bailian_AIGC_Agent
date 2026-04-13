@@ -3,6 +3,7 @@ import { User, Loader2, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/Button.tsx";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/Card.tsx";
 import { generateAIResponse } from "@/services/geminiService";
+import { extractJSON } from "@/lib/workflow-utils";
 import { Node1Data } from "@/types";
 
 export function Node1Questionnaire({ onComplete, onUpdate, currentData }: { onComplete: (data: Node1Data) => void, onUpdate: (data: Node1Data) => void, currentData?: Node1Data }) {
@@ -38,11 +39,11 @@ export function Node1Questionnaire({ onComplete, onUpdate, currentData }: { onCo
         "persona_summary": "一句话总结该人群的灵魂特质"
       }`;
 
-      const response = await generateAIResponse("gemini-3-flash-preview", [
+      const response = await generateAIResponse("gemini-1.5-flash", [
         { role: "user", parts: [{ text: prompt }] }
       ], { responseMimeType: "application/json" });
 
-      const result = JSON.parse(response.text);
+      const result = extractJSON(response.text);
       onUpdate(result);
     } catch (error) {
       console.error("Node 1 Error:", error);

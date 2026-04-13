@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/Button.tsx";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/Card.tsx";
 import { cn } from "@/lib/utils";
 import { analyzeImage } from "@/services/geminiService";
+import { extractJSON } from "@/lib/workflow-utils";
 import { Node1Data, Node2Data } from "@/types";
 
 export function Node2Material({ onComplete, onUpdate, personData, currentData }: { onComplete: (data: Node2Data) => void, onUpdate: (data: Node2Data) => void, personData: Node1Data | undefined, currentData?: Node2Data }) {
@@ -54,8 +55,8 @@ export function Node2Material({ onComplete, onUpdate, personData, currentData }:
         }
       }`;
 
-      const response = await analyzeImage(file, prompt, "gemini-3-flash-preview");
-      const result = JSON.parse(response.text);
+      const response = await analyzeImage(file, prompt, "gemini-1.5-flash");
+      const result = extractJSON(response.text);
       onUpdate(result);
     } catch (error) {
       console.error("Node 2 Error:", error);

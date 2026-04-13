@@ -3,6 +3,7 @@ import { MapPin, Loader2, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/Button.tsx";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/Card.tsx";
 import { generateAIResponse } from "@/services/geminiService";
+import { extractJSON } from "@/lib/workflow-utils";
 import { Node3Data } from "@/types";
 
 export function Node3Venue({ onComplete, onUpdate, constraints, context }: { onComplete: (data: Node3Data) => void, onUpdate: (data: Node3Data) => void, constraints: string[], context: any }) {
@@ -34,11 +35,11 @@ export function Node3Venue({ onComplete, onUpdate, constraints, context }: { onC
         "aesthetic_redline": "美学红线描述"
       }`;
 
-      const response = await generateAIResponse("gemini-3-flash-preview", [
+      const response = await generateAIResponse("gemini-1.5-flash", [
         { role: "user", parts: [{ text: prompt }] }
       ], { responseMimeType: "application/json" });
 
-      const result = JSON.parse(response.text);
+      const result = extractJSON(response.text);
       onUpdate(result);
     } catch (error) {
       console.error("Node 3 Error:", error);

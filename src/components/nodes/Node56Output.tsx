@@ -3,6 +3,7 @@ import { Sparkles, Image as ImageIcon, Send, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/Button.tsx";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/Card.tsx";
 import { generateAIResponse } from "@/services/geminiService";
+import { extractJSON } from "@/lib/workflow-utils";
 
 export function Node56Output({ onComplete, onUpdate, context, onShowPresentation }: { onComplete: (data: any) => void, onUpdate: (data: any) => void, context: any, onShowPresentation: () => void }) {
   const [loading, setLoading] = useState(!context.node5);
@@ -27,11 +28,11 @@ export function Node56Output({ onComplete, onUpdate, context, onShowPresentation
           "marketing_copy": "一段示例营销文案"
         }`;
 
-        const response = await generateAIResponse("gemini-3-flash-preview", [
+        const response = await generateAIResponse("gemini-1.5-flash", [
           { role: "user", parts: [{ text: prompt }] }
         ], { responseMimeType: "application/json" });
 
-        const result = JSON.parse(response.text);
+        const result = extractJSON(response.text);
         onUpdate(result);
       } catch (error) {
         console.error("Node 5/6 Error:", error);

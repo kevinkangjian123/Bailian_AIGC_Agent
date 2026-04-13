@@ -96,7 +96,7 @@ async function startServer() {
         throw new Error("GEMINI_API_KEY is missing in environment.");
       }
 
-      const modelName = model || "gemini-3-flash-preview";
+      const modelName = model || "gemini-1.5-flash";
       // Use direct REST API call to be 100% sure about the API Key transmission
       const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
       
@@ -106,7 +106,7 @@ async function startServer() {
         method: "POST",
         headers: { 
           "Content-Type": "application/json",
-          "x-goog-api-key": apiKey // Send in both URL and Header for maximum compatibility
+          "x-goog-api-key": apiKey 
         },
         body: JSON.stringify({ 
           contents: Array.isArray(contents) ? contents : [{ role: "user", parts: [{ text: String(contents) }] }],
@@ -122,6 +122,7 @@ async function startServer() {
       }
       
       const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+      console.log(`[Generate] Success. Response preview: ${text?.substring(0, 100)}...`);
       res.json({ text });
     } catch (error: any) {
       console.error("Manual AI Error:", error);
@@ -141,7 +142,7 @@ async function startServer() {
       
       if (!apiKey) throw new Error("GEMINI_API_KEY is missing");
 
-      const modelName = model || "gemini-3-flash-preview";
+      const modelName = model || "gemini-1.5-flash";
       const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
 
       const response = await fetch(url, {

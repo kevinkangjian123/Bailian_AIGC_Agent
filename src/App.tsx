@@ -13,7 +13,7 @@ import { Node3Venue } from "@/components/nodes/Node3Venue";
 import { Node4Strategy } from "@/components/nodes/Node4Strategy";
 import { Node56Output } from "@/components/nodes/Node56Output";
 import { PresentationMode } from "@/components/shared/PresentationMode";
-import { getNodeTitle, getPersonaForNode, getTransitionMessage } from "@/lib/workflow-utils";
+import { getNodeTitle, getPersonaForNode, getTransitionMessage, extractJSON } from "@/lib/workflow-utils";
 import { Card } from "@/components/ui/Card.tsx";
 import { generateAIResponse } from "@/services/geminiService";
 
@@ -140,8 +140,8 @@ export default function App() {
       }
 
       if (refinementPrompt && targetNodeKey) {
-        const response = await generateAIResponse("gemini-3-flash-preview", [{ role: "user", parts: [{ text: refinementPrompt }] }]);
-        const updatedData = JSON.parse(response.text);
+        const response = await generateAIResponse("gemini-1.5-flash", [{ role: "user", parts: [{ text: refinementPrompt }] }]);
+        const updatedData = extractJSON(response.text);
         
         setState(prev => ({
           ...prev,

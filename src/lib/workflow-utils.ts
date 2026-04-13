@@ -30,3 +30,36 @@ export const getTransitionMessage = (nodeId: NodeID, nextPersona: Persona): stri
     default: return "所有流程已完成，您可以查看最终的策划报告了。";
   }
 };
+
+/**
+ * Extracts JSON from a string that might contain markdown code blocks or other text.
+ */
+export const extractJSON = (text: string) => {
+  try {
+    // Try direct parse first
+    return JSON.parse(text);
+  } catch (e) {
+    // Look for JSON block in markdown
+    const match = text.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
+    if (match && match[1]) {
+      try {
+        return JSON.parse(match[1]);
+      } catch (e2) {
+        console.error("Failed to parse extracted JSON block", e2);
+      }
+    }
+    
+    // Last resort: find the first { and last }
+    const firstBrace = text.indexOf("{");
+    const lastBrace = text.lastIndexOf("}");
+    if (firstBrace !== -1 && lastBrace !== -1) {
+      try {
+        return JSON.parse(text.substring(firstBrace, lastBrace + 1));
+      } catch (e3) {
+        console.error("Failed to parse JSON substring", e3);
+      }
+    }
+    
+    throw new Error("Could not find valid JSON in response");
+  }
+};
