@@ -96,37 +96,51 @@ async function startServer() {
         throw new Error("GEMINI_API_KEY is missing in environment.");
       }
 
-      const modelName = model || "gemini-1.5-flash";
-      // Use direct REST API call to be 100% sure about the API Key transmission
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
-      
-      console.log(`[Generate] Manually fetching Gemini. Model: ${modelName}. Key prefix: ${apiKey.substring(0, 4)}`);
+      // Try multiple model names in order of preference
+      const modelsToTry = [model, "gemini-3-flash-preview", "gemini-1.5-flash", "gemini-2.0-flash-exp"].filter(Boolean);
+      let lastError = null;
 
-      const response = await fetch(url, {
-        method: "POST",
-        headers: { 
-          "Content-Type": "application/json",
-          "x-goog-api-key": apiKey 
-        },
-        body: JSON.stringify({ 
-          contents: Array.isArray(contents) ? contents : [{ role: "user", parts: [{ text: String(contents) }] }],
-          generationConfig: config 
-        }),
-      });
+      for (const modelName of modelsToTry) {
+        try {
+          // Use v1beta for access to the latest preview models like gemini-3
+          const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
+          
+          console.log(`[Generate] Attempting Gemini. Model: ${modelName}. API Version: v1beta`);
 
-      const data: any = await response.json();
-      
-      if (data.error) {
-        console.error("Google REST API Error:", JSON.stringify(data.error, null, 2));
-        return res.status(data.error.code || 500).json({ error: data.error.message });
+          const response = await fetch(url, {
+            method: "POST",
+            headers: { 
+              "Content-Type": "application/json",
+              "x-goog-api-key": apiKey 
+            },
+            body: JSON.stringify({ 
+              contents: Array.isArray(contents) ? contents : [{ role: "user", parts: [{ text: String(contents) }] }],
+              generationConfig: config 
+            }),
+          });
+
+          const data: any = await response.json();
+          
+          if (data.error) {
+            console.warn(`[Generate] Model ${modelName} failed: ${data.error.message}`);
+            lastError = data.error;
+            continue; // Try next model
+          }
+          
+          const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+          console.log(`[Generate] Success with ${modelName}. Response preview: ${text?.substring(0, 50)}...`);
+          return res.json({ text });
+        } catch (err) {
+          console.error(`[Generate] Fetch error for ${modelName}:`, err);
+          lastError = err;
+        }
       }
-      
-      const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
-      console.log(`[Generate] Success. Response preview: ${text?.substring(0, 100)}...`);
-      res.json({ text });
+
+      // If we reach here, all models failed
+      throw lastError || new Error("All Gemini models failed to respond.");
     } catch (error: any) {
       console.error("Manual AI Error:", error);
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ error: error.message || "Internal AI Error" });
     }
   });
 
@@ -142,38 +156,55 @@ async function startServer() {
       
       if (!apiKey) throw new Error("GEMINI_API_KEY is missing");
 
-      const modelName = model || "gemini-1.5-flash";
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
+      const modelsToTry = [model, "gemini-3-flash-preview", "gemini-1.5-flash", "gemini-2.0-flash-exp"].filter(Boolean);
+      let lastError = null;
 
-      const response = await fetch(url, {
-        method: "POST",
-        headers: { 
-          "Content-Type": "application/json",
-          "x-goog-api-key": apiKey 
-        },
-        body: JSON.stringify({
-          contents: [
-            {
-              role: "user",
-              parts: [
-                { text: prompt },
+      for (const modelName of modelsToTry) {
+        try {
+          const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
+          
+          console.log(`[Vision] Attempting Gemini. Model: ${modelName}. API Version: v1beta`);
+
+          const response = await fetch(url, {
+            method: "POST",
+            headers: { 
+              "Content-Type": "application/json",
+              "x-goog-api-key": apiKey 
+            },
+            body: JSON.stringify({
+              contents: [
                 {
-                  inlineData: {
-                    mimeType: req.file!.mimetype,
-                    data: req.file!.buffer.toString("base64"),
-                  },
+                  role: "user",
+                  parts: [
+                    { text: prompt },
+                    {
+                      inlineData: {
+                        mimeType: req.file!.mimetype,
+                        data: req.file!.buffer.toString("base64"),
+                      },
+                    },
+                  ],
                 },
               ],
-            },
-          ],
-        }),
-      });
+            }),
+          });
 
-      const data: any = await response.json();
-      if (data.error) throw new Error(data.error.message);
+          const data: any = await response.json();
+          if (data.error) {
+            console.warn(`[Vision] Model ${modelName} failed: ${data.error.message}`);
+            lastError = data.error;
+            continue;
+          }
+          
+          const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+          console.log(`[Vision] Success with ${modelName}`);
+          return res.json({ text });
+        } catch (err) {
+          lastError = err;
+        }
+      }
       
-      const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
-      res.json({ text });
+      throw lastError || new Error("All Vision models failed.");
     } catch (error: any) {
       console.error("Vision Error:", error);
       res.status(500).json({ error: error.message });
