@@ -17,14 +17,8 @@ import { getNodeTitle, getPersonaForNode, getTransitionMessage, extractJSON } fr
 import { Card } from "@/components/ui/Card.tsx";
 import { generateAIResponse } from "@/services/geminiService";
 
-import { ErrorBoundary } from "./components/ErrorBoundary";
-
 export default function App() {
-  return (
-    <ErrorBoundary>
-      <AppContent />
-    </ErrorBoundary>
-  );
+  return <AppContent />;
 }
 
 function AppContent() {
