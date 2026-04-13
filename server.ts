@@ -14,7 +14,7 @@ const __dirname = path.dirname(__filename);
 
 async function startServer() {
   const app = express();
-  const PORT = process.env.PORT || 8080;
+  const PORT = Number(process.env.PORT) || 8080;
 
   app.use(cors());
   app.use(express.json());
@@ -40,8 +40,14 @@ async function startServer() {
   const storage = multer.memoryStorage();
   const upload = multer({ storage: storage });
 
-  // Gemini API Setup
-  const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
+  // Gemini API Lazy Initialization Helper
+  const getAiClient = () => {
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) {
+      throw new Error("GEMINI_API_KEY environment variable is missing. Please set it in your environment settings.");
+    }
+    return new GoogleGenAI({ apiKey });
+  };
 
   // API Routes
   app.get("/api/health", (req, res) => {
@@ -52,6 +58,7 @@ async function startServer() {
   app.post("/api/ai/generate", async (req, res) => {
     try {
       const { model, contents, config } = req.body;
+      const ai = getAiClient();
       const response = await ai.models.generateContent({ 
         model: model || "gemini-3-flash-preview", 
         contents, 
@@ -71,6 +78,7 @@ async function startServer() {
         return res.status(400).json({ error: "No image uploaded" });
       }
       const { prompt, model } = req.body;
+      const ai = getAiClient();
       
       const response = await ai.models.generateContent({
         model: model || "gemini-3-flash-preview",
