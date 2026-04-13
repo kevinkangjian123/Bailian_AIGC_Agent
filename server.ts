@@ -19,6 +19,23 @@ async function startServer() {
   app.use(cors());
   app.use(express.json());
 
+  // Request Logging Middleware
+  app.use((req, res, next) => {
+    const start = Date.now();
+    res.on("finish", () => {
+      const duration = Date.now() - start;
+      console.log(`[${new Date().toISOString()}] ${req.method} ${req.path} ${res.statusCode} - ${duration}ms`);
+    });
+    next();
+  });
+
+  // Diagnostic Logs for Environment
+  console.log("--- Environment Diagnostics ---");
+  console.log("NODE_ENV:", process.env.NODE_ENV);
+  console.log("CWD:", process.cwd());
+  console.log("GEMINI_API_KEY:", process.env.GEMINI_API_KEY ? "PRESENT (Masked)" : "MISSING");
+  console.log("-------------------------------");
+
   // Multer setup for image uploads
   const storage = multer.memoryStorage();
   const upload = multer({ storage: storage });

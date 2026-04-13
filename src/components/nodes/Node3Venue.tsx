@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { MapPin, Loader2, ChevronRight } from "lucide-react";
-import { Button } from "@/components/ui/Button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/Card";
+import { Button } from "@/components/ui/Button.tsx";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/Card.tsx";
 import { generateAIResponse } from "@/services/geminiService";
 import { Node3Data } from "@/types";
 

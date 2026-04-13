@@ -6,7 +6,19 @@ import {defineConfig, loadEnv} from 'vite';
 export default defineConfig(({mode}) => {
   const env = loadEnv(mode, '.', '');
   return {
-    plugins: [react(), tailwindcss()],
+    plugins: [
+      react(), 
+      tailwindcss(),
+      {
+        name: 'debug-resolver',
+        resolveId(source, importer) {
+          if (source.includes('components/ui')) {
+            console.log(`[Vite Debug] Resolving: ${source} from ${importer}`);
+          }
+          return null;
+        }
+      }
+    ],
     define: {
       'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY || ''),
     },

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Image as ImageIcon, User, CheckCircle2, Loader2, ChevronRight } from "lucide-react";
-import { Button } from "@/components/ui/Button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/Card";
+import { Button } from "@/components/ui/Button.tsx";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/Card.tsx";
 import { cn } from "@/lib/utils";
 import { analyzeImage } from "@/services/geminiService";
 import { Node1Data, Node2Data } from "@/types";
