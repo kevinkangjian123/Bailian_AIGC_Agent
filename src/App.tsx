@@ -17,7 +17,17 @@ import { getNodeTitle, getPersonaForNode, getTransitionMessage, extractJSON } fr
 import { Card } from "@/components/ui/Card.tsx";
 import { generateAIResponse } from "@/services/geminiService";
 
+import { ErrorBoundary } from "./components/ErrorBoundary";
+
 export default function App() {
+  return (
+    <ErrorBoundary>
+      <AppContent />
+    </ErrorBoundary>
+  );
+}
+
+function AppContent() {
   const [state, setState] = useState<WorkflowState>(INITIAL_STATE);
   const [messages, setMessages] = useState<{ role: "ai" | "user"; content: string }[]>([
     { role: "ai", content: "欢迎来到百联 AI 企划助手。我是您的智能大脑，将协助您完成从人群画像到策展方案的全过程。让我们从第一步：消费者画像深度分析开始吧。" }
@@ -84,7 +94,7 @@ export default function App() {
               请基于以下原始分析和用户反馈，重新定义视觉基因和逻辑：
               [Current_Data]: ${JSON.stringify(state.data_locker.node2)}
               
-              要求输出 JSON 格式，包含 visual_dna (color_palette, color_description, texture, form), routes (a, b 两个方案，每个包含 title, logic)。
+              要求输出 JSON 格式，包含 visual_dna (color_palette, color_description, texture, form) 和 route (包含 title, logic)。
             `;
             successMessage = "视觉基因提取已重新聚焦，方案逻辑已更新。";
           }

@@ -25,10 +25,7 @@ export interface Node2Data {
     texture: string;
     form: string;
   };
-  routes: {
-    a: { title: string; logic: string };
-    b: { title: string; logic: string };
-  };
+  route: { title: string; logic: string };
 }
 
 export interface Node3Data {

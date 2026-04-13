@@ -49,10 +49,7 @@ export function Node2Material({ onComplete, onUpdate, personData, currentData }:
           "texture": "材质描述", 
           "form": "形态描述" 
         },
-        "routes": { 
-          "a": { "title": "4字标题", "logic": "视觉张力优先逻辑" }, 
-          "b": { "title": "4字标题", "logic": "叙事沉浸优先逻辑" } 
-        }
+        "route": { "title": "4字标题", "logic": "核心美学推演逻辑" }
       }`;
 
       const response = await analyzeImage(file, prompt, "gemini-1.5-flash");
@@ -67,10 +64,7 @@ export function Node2Material({ onComplete, onUpdate, personData, currentData }:
           form: "流线型", 
           color_palette: ["#F27D26", "#E4E3E0", "#141414"] 
         },
-        routes: { 
-          a: { title: "视觉张力", logic: "通过高对比度材质展现视觉冲击力" }, 
-          b: { title: "叙事沉浸", logic: "通过细腻质感引导用户深度停留" } 
-        }
+        route: { title: "愈见之境", logic: "通过高对比度材质展现视觉冲击力，同时利用流线形态引导用户深度停留。" }
       });
     } finally {
       setLoading(false);
@@ -124,16 +118,10 @@ export function Node2Material({ onComplete, onUpdate, personData, currentData }:
             </div>
 
             <div className="space-y-4">
-              <h4 className="text-[10px] font-bold uppercase tracking-widest text-gray-400">推演方向</h4>
-              <div className="grid grid-cols-1 gap-3">
-                <div className="p-4 border border-gray-100 bg-gray-50/50 rounded-2xl hover:border-[#C8102E]/30 transition-colors">
-                  <h5 className="font-bold text-sm text-gray-800">方向 A: {currentData.routes.a.title}</h5>
-                  <p className="text-xs text-gray-600 mt-1 leading-relaxed">{currentData.routes.a.logic}</p>
-                </div>
-                <div className="p-4 border border-gray-100 bg-gray-50/50 rounded-2xl hover:border-[#C8102E]/30 transition-colors">
-                  <h5 className="font-bold text-sm text-gray-800">方向 B: {currentData.routes.b.title}</h5>
-                  <p className="text-xs text-gray-600 mt-1 leading-relaxed">{currentData.routes.b.logic}</p>
-                </div>
+              <h4 className="text-[10px] font-bold uppercase tracking-widest text-gray-400">核心推演方向</h4>
+              <div className="p-6 border border-[#C8102E]/20 bg-red-50/30 rounded-3xl">
+                <h5 className="font-bold text-lg text-[#C8102E] mb-2">{currentData.route.title}</h5>
+                <p className="text-xs text-gray-700 leading-relaxed">{currentData.route.logic}</p>
               </div>
             </div>
           </div>

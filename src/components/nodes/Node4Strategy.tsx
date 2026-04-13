@@ -9,12 +9,11 @@ import { Node4Data } from "@/types";
 
 export function Node4Strategy({ onComplete, onUpdate, context }: { onComplete: (data: Node4Data) => void, onUpdate: (data: Node4Data) => void, context: any }) {
   const [loading, setLoading] = useState(false);
-  const [selectedId, setSelectedId] = useState<string | null>(null);
   const currentData = context.node4 as Node4Data | undefined;
 
-  const handleSubmit = async (strategyTitle: string, id: string) => {
+  const handleSubmit = async () => {
     setLoading(true);
-    setSelectedId(id);
+    const strategyTitle = context.node2?.route?.title || "愈见之境";
     try {
       const prompt = `作为执行导演，基于以下“因果审计”后的信息生成一份具备“感官呼吸感”的策展剧本。
       
@@ -93,67 +92,71 @@ export function Node4Strategy({ onComplete, onUpdate, context }: { onComplete: (
           <CardDescription className="text-base mt-2">{currentData.concept}</CardDescription>
         </CardHeader>
         <CardContent className="p-8 pt-0 space-y-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="space-y-4">
-              <div className="p-4 bg-gray-50 rounded-xl space-y-2">
-                <h5 className="text-[10px] font-bold text-gray-400 uppercase">视觉叙事</h5>
-                <p className="text-sm leading-relaxed">{currentData.sensory_script.visual}</p>
+          {currentData.sensory_script && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-4">
+                <div className="p-4 bg-gray-50 rounded-xl space-y-2">
+                  <h5 className="text-[10px] font-bold text-gray-400 uppercase">视觉叙事</h5>
+                  <p className="text-sm leading-relaxed">{currentData.sensory_script.visual}</p>
+                </div>
+                <div className="p-4 bg-gray-50 rounded-xl space-y-2">
+                  <h5 className="text-[10px] font-bold text-gray-400 uppercase">听觉节奏</h5>
+                  <p className="text-sm leading-relaxed">{currentData.sensory_script.auditory}</p>
+                </div>
               </div>
-              <div className="p-4 bg-gray-50 rounded-xl space-y-2">
-                <h5 className="text-[10px] font-bold text-gray-400 uppercase">听觉节奏</h5>
-                <p className="text-sm leading-relaxed">{currentData.sensory_script.auditory}</p>
+              <div className="space-y-4">
+                <div className="p-4 bg-gray-50 rounded-xl space-y-2">
+                  <h5 className="text-[10px] font-bold text-gray-400 uppercase">触觉基因</h5>
+                  <p className="text-sm leading-relaxed">{currentData.sensory_script.tactile}</p>
+                </div>
+                <div className="p-4 bg-gray-50 rounded-xl space-y-2">
+                  <h5 className="text-[10px] font-bold text-gray-400 uppercase">心理压力</h5>
+                  <p className="text-sm leading-relaxed">{currentData.sensory_script.psychological}</p>
+                </div>
               </div>
             </div>
-            <div className="space-y-4">
-              <div className="p-4 bg-gray-50 rounded-xl space-y-2">
-                <h5 className="text-[10px] font-bold text-gray-400 uppercase">触觉基因</h5>
-                <p className="text-sm leading-relaxed">{currentData.sensory_script.tactile}</p>
-              </div>
-              <div className="p-4 bg-gray-50 rounded-xl space-y-2">
-                <h5 className="text-[10px] font-bold text-gray-400 uppercase">心理压力</h5>
-                <p className="text-sm leading-relaxed">{currentData.sensory_script.psychological}</p>
-              </div>
-            </div>
-          </div>
+          )}
 
-          <div className="p-8 bg-gray-900 rounded-3xl space-y-6">
-            <div className="flex justify-between items-center">
-              <h4 className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Psychological Pressure Curve</h4>
-              <span className="text-[10px] text-[#C8102E] font-bold">实时拟合数据</span>
-            </div>
-            <div className="h-32 w-full relative">
-              <svg className="w-full h-full" viewBox="0 0 400 100" preserveAspectRatio="none">
-                <path 
-                  d={`M 0 ${100 - currentData.pressure_points[0]} 
-                     L 100 ${100 - currentData.pressure_points[1]} 
-                     L 200 ${100 - currentData.pressure_points[2]} 
-                     L 300 ${100 - currentData.pressure_points[3]} 
-                     L 400 ${100 - currentData.pressure_points[4]}`} 
-                  fill="none" 
-                  stroke="#C8102E" 
-                  strokeWidth="2"
-                  className="transition-all duration-1000"
-                />
-                {[0, 100, 200, 300, 400].map((x, i) => (
-                  <circle 
-                    key={x} 
-                    cx={x} 
-                    cy={100 - currentData.pressure_points[i]} 
-                    r="3" 
-                    fill="#C8102E" 
+          {currentData.pressure_points && (
+            <div className="p-8 bg-gray-900 rounded-3xl space-y-6">
+              <div className="flex justify-between items-center">
+                <h4 className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Psychological Pressure Curve</h4>
+                <span className="text-[10px] text-[#C8102E] font-bold">实时拟合数据</span>
+              </div>
+              <div className="h-32 w-full relative">
+                <svg className="w-full h-full" viewBox="0 0 400 100" preserveAspectRatio="none">
+                  <path 
+                    d={`M 0 ${100 - (currentData.pressure_points[0] || 0)} 
+                       L 100 ${100 - (currentData.pressure_points[1] || 0)} 
+                       L 200 ${100 - (currentData.pressure_points[2] || 0)} 
+                       L 300 ${100 - (currentData.pressure_points[3] || 0)} 
+                       L 400 ${100 - (currentData.pressure_points[4] || 0)}`} 
+                    fill="none" 
+                    stroke="#C8102E" 
+                    strokeWidth="2"
                     className="transition-all duration-1000"
                   />
-                ))}
-              </svg>
-              <div className="absolute bottom-0 left-0 right-0 flex justify-between text-[8px] text-gray-500 font-mono mt-2">
-                <span>ENTRY</span>
-                <span>IMMERSION</span>
-                <span>CLIMAX</span>
-                <span>RETENTION</span>
-                <span>EXIT</span>
+                  {[0, 100, 200, 300, 400].map((x, i) => (
+                    <circle 
+                      key={x} 
+                      cx={x} 
+                      cy={100 - (currentData.pressure_points?.[i] || 0)} 
+                      r="3" 
+                      fill="#C8102E" 
+                      className="transition-all duration-1000"
+                    />
+                  ))}
+                </svg>
+                <div className="absolute bottom-0 left-0 right-0 flex justify-between text-[8px] text-gray-500 font-mono mt-2">
+                  <span>ENTRY</span>
+                  <span>IMMERSION</span>
+                  <span>CLIMAX</span>
+                  <span>RETENTION</span>
+                  <span>EXIT</span>
+                </div>
               </div>
             </div>
-          </div>
+          )}
 
           <div className="bg-red-50 p-6 rounded-2xl border border-red-100">
             <h5 className="text-[10px] font-bold text-[#C8102E] uppercase mb-2">导演手记</h5>
@@ -206,37 +209,20 @@ export function Node4Strategy({ onComplete, onUpdate, context }: { onComplete: (
         </div>
 
         <div className="space-y-4">
-          <button 
-            disabled={loading}
-            onClick={() => handleSubmit(context.node2?.routes?.a?.title || "愈见之境", "a")}
-            className={cn(
-              "w-full text-left p-6 border-2 rounded-2xl transition-all relative overflow-hidden group",
-              selectedId === "a" ? "border-[#C8102E] bg-red-50/30" : "border-gray-100 bg-white hover:border-[#C8102E]/30"
-            )}
-          >
-            {loading && selectedId === "a" && <Loader2 className="absolute top-4 right-4 animate-spin text-[#C8102E]" size={20} />}
-            <h3 className="font-bold text-xl mb-2 flex items-center gap-2">
-              <span className="w-6 h-6 rounded-full bg-gray-900 text-white text-[10px] flex items-center justify-center">A</span>
-              {context.node2?.routes?.a?.title || "愈见之境"}
-            </h3>
-            <p className="text-sm text-gray-600 leading-relaxed">{context.node2?.routes?.a?.logic || "利用流体金属材质与温暖光影，为目标人群打造一个情绪避风港。"}</p>
-          </button>
-
-          <button 
-            disabled={loading}
-            onClick={() => handleSubmit(context.node2?.routes?.b?.title || "数字丝绒", "b")}
-            className={cn(
-              "w-full text-left p-6 border-2 rounded-2xl transition-all relative overflow-hidden group",
-              selectedId === "b" ? "border-[#C8102E] bg-red-50/30" : "border-gray-100 bg-white hover:border-[#C8102E]/30"
-            )}
-          >
-            {loading && selectedId === "b" && <Loader2 className="absolute top-4 right-4 animate-spin text-[#C8102E]" size={20} />}
-            <h3 className="font-bold text-xl mb-2 flex items-center gap-2">
-              <span className="w-6 h-6 rounded-full bg-gray-900 text-white text-[10px] flex items-center justify-center">B</span>
-              {context.node2?.routes?.b?.title || "数字丝绒"}
-            </h3>
-            <p className="text-sm text-gray-600 leading-relaxed">{context.node2?.routes?.b?.logic || "强调触感与叙事，通过丝绒质感的数字投影，拉长用户的停留与沉浸时间。"}</p>
-          </button>
+          <div className="p-8 border-2 border-[#C8102E] rounded-3xl bg-red-50/30 relative">
+            <div className="absolute top-4 right-4 bg-[#C8102E] text-white text-[10px] px-3 py-1 rounded-full font-bold uppercase tracking-widest">Selected Strategy</div>
+            <h3 className="font-bold text-2xl mb-3">{context.node2?.route?.title || "愈见之境"}</h3>
+            <p className="text-sm text-gray-600 leading-relaxed mb-6">{context.node2?.route?.logic || "利用流体金属材质与温暖光影，为目标人群打造一个情绪避风港。"}</p>
+            
+            <Button 
+              disabled={loading}
+              onClick={handleSubmit}
+              className="w-full h-14 bg-[#C8102E] hover:bg-[#A00D25] text-white font-bold text-lg rounded-xl shadow-lg transition-all"
+            >
+              {loading ? <Loader2 className="animate-spin mr-2" /> : <Target className="mr-2" />}
+              {loading ? "正在生成感官剧本..." : "生成深度感官剧本"}
+            </Button>
+          </div>
         </div>
 
         {/* Psychological Pressure Chart Preview */}
