@@ -2,16 +2,19 @@ import React, { useState } from "react";
 import { Target, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/Button.tsx";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/Card.tsx";
+import { cn } from "@/lib/utils";
 import { generateAIResponse } from "@/services/geminiService";
 import { extractJSON } from "@/lib/workflow-utils";
 import { Node4Data } from "@/types";
 
 export function Node4Strategy({ onComplete, onUpdate, context }: { onComplete: (data: Node4Data) => void, onUpdate: (data: Node4Data) => void, context: any }) {
   const [loading, setLoading] = useState(false);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
   const currentData = context.node4 as Node4Data | undefined;
 
-  const handleSubmit = async (strategyTitle: string) => {
+  const handleSubmit = async (strategyTitle: string, id: string) => {
     setLoading(true);
+    setSelectedId(id);
     try {
       const prompt = `作为执行导演，基于以下“因果审计”后的信息生成一份具备“感官呼吸感”的策展剧本。
       
@@ -203,21 +206,37 @@ export function Node4Strategy({ onComplete, onUpdate, context }: { onComplete: (
         </div>
 
         <div className="space-y-4">
-          <div 
-            onClick={() => handleSubmit(context.node2?.routes?.a?.title || "愈见之境")}
-            className="p-6 border-2 border-[#C8102E] rounded-2xl bg-red-50/30 relative cursor-pointer hover:scale-[1.02] transition-transform"
+          <button 
+            disabled={loading}
+            onClick={() => handleSubmit(context.node2?.routes?.a?.title || "愈见之境", "a")}
+            className={cn(
+              "w-full text-left p-6 border-2 rounded-2xl transition-all relative overflow-hidden group",
+              selectedId === "a" ? "border-[#C8102E] bg-red-50/30" : "border-gray-100 bg-white hover:border-[#C8102E]/30"
+            )}
           >
-            <div className="absolute top-4 right-4 bg-[#C8102E] text-white text-[10px] px-2 py-1 rounded font-bold">推荐方案</div>
-            <h3 className="font-bold text-xl mb-2">方案 A：{context.node2?.routes?.a?.title || "愈见之境"}</h3>
-            <p className="text-sm text-gray-600">{context.node2?.routes?.a?.logic || "利用流体金属材质与温暖光影，为 INFP 人群打造一个都市中的情绪避风港。"}</p>
-          </div>
-          <div 
-            onClick={() => handleSubmit(context.node2?.routes?.b?.title || "数字丝绒")}
-            className="p-6 border border-gray-200 rounded-2xl hover:border-[#C8102E] transition-colors cursor-pointer hover:scale-[1.02] transition-transform"
+            {loading && selectedId === "a" && <Loader2 className="absolute top-4 right-4 animate-spin text-[#C8102E]" size={20} />}
+            <h3 className="font-bold text-xl mb-2 flex items-center gap-2">
+              <span className="w-6 h-6 rounded-full bg-gray-900 text-white text-[10px] flex items-center justify-center">A</span>
+              {context.node2?.routes?.a?.title || "愈见之境"}
+            </h3>
+            <p className="text-sm text-gray-600 leading-relaxed">{context.node2?.routes?.a?.logic || "利用流体金属材质与温暖光影，为目标人群打造一个情绪避风港。"}</p>
+          </button>
+
+          <button 
+            disabled={loading}
+            onClick={() => handleSubmit(context.node2?.routes?.b?.title || "数字丝绒", "b")}
+            className={cn(
+              "w-full text-left p-6 border-2 rounded-2xl transition-all relative overflow-hidden group",
+              selectedId === "b" ? "border-[#C8102E] bg-red-50/30" : "border-gray-100 bg-white hover:border-[#C8102E]/30"
+            )}
           >
-            <h3 className="font-bold text-xl mb-2">方案 B：{context.node2?.routes?.b?.title || "数字丝绒"}</h3>
-            <p className="text-sm text-gray-600">{context.node2?.routes?.b?.logic || "强调触感与叙事，通过丝绒质感的数字投影，拉长用户的停留与沉浸时间。"}</p>
-          </div>
+            {loading && selectedId === "b" && <Loader2 className="absolute top-4 right-4 animate-spin text-[#C8102E]" size={20} />}
+            <h3 className="font-bold text-xl mb-2 flex items-center gap-2">
+              <span className="w-6 h-6 rounded-full bg-gray-900 text-white text-[10px] flex items-center justify-center">B</span>
+              {context.node2?.routes?.b?.title || "数字丝绒"}
+            </h3>
+            <p className="text-sm text-gray-600 leading-relaxed">{context.node2?.routes?.b?.logic || "强调触感与叙事，通过丝绒质感的数字投影，拉长用户的停留与沉浸时间。"}</p>
+          </button>
         </div>
 
         {/* Psychological Pressure Chart Preview */}

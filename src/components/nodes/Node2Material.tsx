@@ -125,14 +125,14 @@ export function Node2Material({ onComplete, onUpdate, personData, currentData }:
 
             <div className="space-y-4">
               <h4 className="text-[10px] font-bold uppercase tracking-widest text-gray-400">推演方向</h4>
-              <div className="space-y-3">
-                <div className="p-4 border border-[#C8102E]/20 bg-red-50/30 rounded-2xl">
-                  <h5 className="font-bold text-sm text-[#C8102E]">A: {currentData.routes.a.title}</h5>
-                  <p className="text-xs text-gray-600 mt-1">{currentData.routes.a.logic}</p>
+              <div className="grid grid-cols-1 gap-3">
+                <div className="p-4 border border-gray-100 bg-gray-50/50 rounded-2xl hover:border-[#C8102E]/30 transition-colors">
+                  <h5 className="font-bold text-sm text-gray-800">方向 A: {currentData.routes.a.title}</h5>
+                  <p className="text-xs text-gray-600 mt-1 leading-relaxed">{currentData.routes.a.logic}</p>
                 </div>
-                <div className="p-4 border border-gray-100 bg-gray-50 rounded-2xl">
-                  <h5 className="font-bold text-sm text-gray-800">B: {currentData.routes.b.title}</h5>
-                  <p className="text-xs text-gray-600 mt-1">{currentData.routes.b.logic}</p>
+                <div className="p-4 border border-gray-100 bg-gray-50/50 rounded-2xl hover:border-[#C8102E]/30 transition-colors">
+                  <h5 className="font-bold text-sm text-gray-800">方向 B: {currentData.routes.b.title}</h5>
+                  <p className="text-xs text-gray-600 mt-1 leading-relaxed">{currentData.routes.b.logic}</p>
                 </div>
               </div>
             </div>
