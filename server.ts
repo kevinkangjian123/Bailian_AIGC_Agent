@@ -42,10 +42,26 @@ async function startServer() {
 
   // Gemini API Lazy Initialization Helper
   const getAiClient = () => {
-    const apiKey = process.env.GEMINI_API_KEY;
+    // Try multiple possible sources for the key
+    const rawKey = process.env.GEMINI_API_KEY || (import.meta as any).env?.GEMINI_API_KEY;
+    
+    // Clean the key: trim whitespace and remove potential surrounding quotes from platform injection
+    const apiKey = rawKey?.trim().replace(/^["']|["']$/g, "");
+    
     if (!apiKey) {
-      throw new Error("GEMINI_API_KEY environment variable is missing. Please set it in your environment settings.");
+      const availableKeys = Object.keys(process.env).filter(k => k.includes("KEY") || k.includes("GEMINI"));
+      console.error(`[Critical] GEMINI_API_KEY is missing. Available related keys: ${availableKeys.join(", ")}`);
+      throw new Error("GEMINI_API_KEY environment variable is missing. Please check your Zeabur environment settings.");
     }
+
+    if (apiKey === "undefined" || apiKey === "null" || apiKey.length < 10) {
+      console.error(`[Critical] GEMINI_API_KEY value is invalid: "${apiKey}"`);
+      throw new Error(`The provided GEMINI_API_KEY is invalid (too short or placeholder). Current value: ${apiKey}`);
+    }
+
+    // Safe logging for debugging
+    console.log(`[Diagnostic] AI Client Init. Source: ${process.env.GEMINI_API_KEY ? "process.env" : "import.meta.env"}. Length: ${apiKey.length}. Prefix: ${apiKey.substring(0, 4)}`);
+    
     return new GoogleGenAI({ apiKey });
   };
 
@@ -54,19 +70,52 @@ async function startServer() {
     res.json({ status: "ok" });
   });
 
+  // Test endpoint to verify API Key directly
+  app.get("/api/ai/test", async (req, res) => {
+    try {
+      const ai = getAiClient();
+      const response = await ai.models.generateContent({
+        model: "gemini-3-flash-preview",
+        contents: "Hi",
+      });
+      res.json({ success: true, text: response.text });
+    } catch (error: any) {
+      console.error("Test API Error:", error);
+      res.status(500).json({ success: false, error: error.message });
+    }
+  });
+
   // Proxy endpoint for Gemini to bypass VPN issues for external users
   app.post("/api/ai/generate", async (req, res) => {
     try {
       const { model, contents, config } = req.body;
-      const ai = getAiClient();
+      
+      // Diagnostic inside the handler
+      const apiKey = process.env.GEMINI_API_KEY?.trim();
+      console.log(`[Generate] Request received. Model: ${model}. Key length: ${apiKey?.length || 0}`);
+      
+      if (!apiKey) {
+        throw new Error("GEMINI_API_KEY is missing in the generate handler.");
+      }
+
+      const ai = new GoogleGenAI({ apiKey });
+      
+      // Ensure contents is in the right format
+      const finalContents = Array.isArray(contents) ? contents : [{ role: "user", parts: [{ text: String(contents) }] }];
+
       const response = await ai.models.generateContent({ 
         model: model || "gemini-3-flash-preview", 
-        contents, 
+        contents: finalContents, 
         config 
       });
+      
       res.json({ text: response.text });
     } catch (error: any) {
       console.error("AI Error:", error);
+      // Log more details if it's a Google API error
+      if (error.response) {
+        console.error("Google API Response Error:", JSON.stringify(error.response, null, 2));
+      }
       res.status(500).json({ error: error.message });
     }
   });
