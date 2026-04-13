@@ -89,33 +89,42 @@ async function startServer() {
   app.post("/api/ai/generate", async (req, res) => {
     try {
       const { model, contents, config } = req.body;
-      
-      // Diagnostic inside the handler
-      const apiKey = process.env.GEMINI_API_KEY?.trim();
-      console.log(`[Generate] Request received. Model: ${model}. Key length: ${apiKey?.length || 0}`);
+      const rawKey = process.env.GEMINI_API_KEY || (import.meta as any).env?.GEMINI_API_KEY;
+      const apiKey = rawKey?.trim().replace(/^["']|["']$/g, "");
       
       if (!apiKey) {
-        throw new Error("GEMINI_API_KEY is missing in the generate handler.");
+        throw new Error("GEMINI_API_KEY is missing in environment.");
       }
 
-      const ai = new GoogleGenAI({ apiKey });
+      const modelName = model || "gemini-3-flash-preview";
+      // Use direct REST API call to be 100% sure about the API Key transmission
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
       
-      // Ensure contents is in the right format
-      const finalContents = Array.isArray(contents) ? contents : [{ role: "user", parts: [{ text: String(contents) }] }];
+      console.log(`[Generate] Manually fetching Gemini. Model: ${modelName}. Key prefix: ${apiKey.substring(0, 4)}`);
 
-      const response = await ai.models.generateContent({ 
-        model: model || "gemini-3-flash-preview", 
-        contents: finalContents, 
-        config 
+      const response = await fetch(url, {
+        method: "POST",
+        headers: { 
+          "Content-Type": "application/json",
+          "x-goog-api-key": apiKey // Send in both URL and Header for maximum compatibility
+        },
+        body: JSON.stringify({ 
+          contents: Array.isArray(contents) ? contents : [{ role: "user", parts: [{ text: String(contents) }] }],
+          generationConfig: config 
+        }),
       });
+
+      const data: any = await response.json();
       
-      res.json({ text: response.text });
-    } catch (error: any) {
-      console.error("AI Error:", error);
-      // Log more details if it's a Google API error
-      if (error.response) {
-        console.error("Google API Response Error:", JSON.stringify(error.response, null, 2));
+      if (data.error) {
+        console.error("Google REST API Error:", JSON.stringify(data.error, null, 2));
+        return res.status(data.error.code || 500).json({ error: data.error.message });
       }
+      
+      const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+      res.json({ text });
+    } catch (error: any) {
+      console.error("Manual AI Error:", error);
       res.status(500).json({ error: error.message });
     }
   });
@@ -127,26 +136,43 @@ async function startServer() {
         return res.status(400).json({ error: "No image uploaded" });
       }
       const { prompt, model } = req.body;
-      const ai = getAiClient();
+      const rawKey = process.env.GEMINI_API_KEY || (import.meta as any).env?.GEMINI_API_KEY;
+      const apiKey = rawKey?.trim().replace(/^["']|["']$/g, "");
       
-      const response = await ai.models.generateContent({
-        model: model || "gemini-3-flash-preview",
-        contents: [
-          {
-            role: "user",
-            parts: [
-              { text: prompt },
-              {
-                inlineData: {
-                  mimeType: req.file.mimetype,
-                  data: req.file.buffer.toString("base64"),
+      if (!apiKey) throw new Error("GEMINI_API_KEY is missing");
+
+      const modelName = model || "gemini-3-flash-preview";
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
+
+      const response = await fetch(url, {
+        method: "POST",
+        headers: { 
+          "Content-Type": "application/json",
+          "x-goog-api-key": apiKey 
+        },
+        body: JSON.stringify({
+          contents: [
+            {
+              role: "user",
+              parts: [
+                { text: prompt },
+                {
+                  inlineData: {
+                    mimeType: req.file!.mimetype,
+                    data: req.file!.buffer.toString("base64"),
+                  },
                 },
-              },
-            ],
-          },
-        ],
+              ],
+            },
+          ],
+        }),
       });
-      res.json({ text: response.text });
+
+      const data: any = await response.json();
+      if (data.error) throw new Error(data.error.message);
+      
+      const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+      res.json({ text });
     } catch (error: any) {
       console.error("Vision Error:", error);
       res.status(500).json({ error: error.message });
