@@ -23,12 +23,12 @@ export function Node56Output({ onComplete, onUpdate, context, onShowPresentation
         人群：${JSON.stringify(context.node1)}
         要求输出 JSON 格式：
         {
-          "visual_prompt": "详细的英文生图指令",
+          "visual_prompt": "详细的中文生图指令，包含场景、材质、光影、构图等细节，适配中文大模型",
           "copy_prompt": "详细的中文文案指令",
           "marketing_copy": "一段示例营销文案"
         }`;
 
-        const response = await generateAIResponse("gemini-1.5-flash", [
+        const response = await generateAIResponse("gemini-3-flash-preview", [
           { role: "user", parts: [{ text: prompt }] }
         ], { responseMimeType: "application/json" });
 
@@ -37,7 +37,7 @@ export function Node56Output({ onComplete, onUpdate, context, onShowPresentation
       } catch (error) {
         console.error("Node 5/6 Error:", error);
         onUpdate({
-          visual_prompt: "A high-end commercial installation in Shanghai, warm amber lighting, fluid metallic textures, velvet-like digital projections, healing atmosphere, INFP personality style, cinematic lighting, 8k resolution --ar 16:9",
+          visual_prompt: "一个位于上海的高端商业装置，温暖的琥珀色灯光，流动的金属质感，天鹅绒般的数字投影，治愈氛围，电影感光影，8k分辨率，16:9比例",
           copy_prompt: "为'都市疗愈追光者'撰写一段策展导言。语调：温暖、治愈、有质感。",
           marketing_copy: "在快节奏的都市中，为您留存一片精神的自留地。"
         });

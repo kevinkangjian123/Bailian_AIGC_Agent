@@ -39,7 +39,7 @@ export function Node1Questionnaire({ onComplete, onUpdate, currentData }: { onCo
         "persona_summary": "一句话总结该人群的灵魂特质"
       }`;
 
-      const response = await generateAIResponse("gemini-1.5-flash", [
+      const response = await generateAIResponse("gemini-3-flash-preview", [
         { role: "user", parts: [{ text: prompt }] }
       ], { responseMimeType: "application/json" });
 

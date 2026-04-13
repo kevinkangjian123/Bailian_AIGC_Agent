@@ -49,7 +49,7 @@ export function Node4Strategy({ onComplete, onUpdate, context }: { onComplete: (
         "director_note": "导演手记"
       }`;
 
-      const response = await generateAIResponse("gemini-1.5-flash", [
+      const response = await generateAIResponse("gemini-3-flash-preview", [
         { role: "user", parts: [{ text: prompt }] }
       ], { responseMimeType: "application/json" });
 

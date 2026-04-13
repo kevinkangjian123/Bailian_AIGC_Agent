@@ -52,7 +52,7 @@ export function Node2Material({ onComplete, onUpdate, personData, currentData }:
         "route": { "title": "4字标题", "logic": "核心美学推演逻辑" }
       }`;
 
-      const response = await analyzeImage(file, prompt, "gemini-1.5-flash");
+      const response = await analyzeImage(file, prompt, "gemini-3-flash-preview");
       const result = extractJSON(response.text);
       onUpdate(result);
     } catch (error) {

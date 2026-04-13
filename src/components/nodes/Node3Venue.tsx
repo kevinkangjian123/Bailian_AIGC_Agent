@@ -35,7 +35,7 @@ export function Node3Venue({ onComplete, onUpdate, constraints, context }: { onC
         "aesthetic_redline": "美学红线描述"
       }`;
 
-      const response = await generateAIResponse("gemini-1.5-flash", [
+      const response = await generateAIResponse("gemini-3-flash-preview", [
         { role: "user", parts: [{ text: prompt }] }
       ], { responseMimeType: "application/json" });
 

@@ -133,18 +133,18 @@ function AppContent() {
               你现在是 AI 提示词专家。用户对生成的 Prompt 提出了修改：
               "${content}"
               
-              请基于以下原始 Prompt 和用户反馈，优化 Prompt：
+              请基于以下原始 Prompt 和用户反馈，优化内容：
               [Current_Data]: ${JSON.stringify(state.data_locker.node5)}
               
-              要求输出 JSON 格式，包含 prompt, negative_prompt, settings。
+              要求输出 JSON 格式，包含 visual_prompt (中文生图指令), copy_prompt (中文文案指令), marketing_copy (示例营销文案)。
             `;
-            successMessage = "AI 提示词已根据您的反馈完成高阶优化。";
+            successMessage = "AI 提示词与营销方案已根据您的反馈完成高阶优化。";
           }
           break;
       }
 
       if (refinementPrompt && targetNodeKey) {
-        const response = await generateAIResponse("gemini-1.5-flash", [{ role: "user", parts: [{ text: refinementPrompt }] }]);
+        const response = await generateAIResponse("gemini-3-flash-preview", [{ role: "user", parts: [{ text: refinementPrompt }] }]);
         const updatedData = extractJSON(response.text);
         
         setState(prev => ({
