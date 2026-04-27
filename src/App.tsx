@@ -16,6 +16,8 @@ import { PresentationMode } from "@/components/shared/PresentationMode";
 import { getNodeTitle, getPersonaForNode, getTransitionMessage, extractJSON } from "@/lib/workflow-utils";
 import { Card } from "@/components/ui/Card.tsx";
 import { generateAIResponse } from "@/services/geminiService";
+import { Home, Undo2, RotateCcw } from "lucide-react";
+import { Button } from "@/components/ui/Button";
 
 export default function App() {
   return <AppContent />;
@@ -209,6 +211,28 @@ function AppContent() {
     }, 2000);
   };
 
+  const handleGoBack = () => {
+    const nodes = Object.values(NodeID);
+    const index = nodes.indexOf(state.current_node);
+    if (index > 0) {
+      const prevNode = nodes[index - 1];
+      setState(prev => ({
+        ...prev,
+        current_node: prevNode as NodeID,
+        active_persona: getPersonaForNode(prevNode as NodeID),
+        lock_chain: { ...prev.lock_chain, [prevNode]: false }
+      }));
+      addAIMessage(`已回到上一步：${getNodeTitle(prevNode as NodeID)}。您可以重新调整数据。`);
+    }
+  };
+
+  const handleReset = () => {
+    if (window.confirm("确定要回退到最开始吗？当前所有进度将会丢失。")) {
+      setState(INITIAL_STATE);
+      setMessages([{ role: "ai", content: "已重启企划流程。让我们重新从消费者画像深度分析开始。" }]);
+    }
+  };
+
   const renderNodeContent = () => {
     switch (state.current_node) {
       case NodeID.NODE_1: 
@@ -282,7 +306,32 @@ function AppContent() {
 
         <section className="flex-1 bg-[#f8f9fa] overflow-y-auto p-4 md:p-10 relative">
           <div className="max-w-4xl mx-auto space-y-6 md:space-y-8">
-            <AestheticDashboard constraints={state.aesthetic_constraints} />
+            <div className="flex items-center justify-between mb-2">
+              <AestheticDashboard constraints={state.aesthetic_constraints} />
+              
+              <div className="flex gap-2 shrink-0">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={handleGoBack}
+                  disabled={state.current_node === NodeID.NODE_1 || state.is_calculating}
+                  className="bg-white border-gray-200 text-gray-600 hover:bg-gray-50 flex items-center gap-2"
+                >
+                  <Undo2 className="w-4 h-4" />
+                  <span className="hidden sm:inline">上一步</span>
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={handleReset}
+                  disabled={state.is_calculating}
+                  className="bg-white border-gray-200 text-gray-600 hover:bg-gray-50 flex items-center gap-2"
+                >
+                  <RotateCcw className="w-4 h-4" />
+                  <span className="hidden sm:inline">重置</span>
+                </Button>
+              </div>
+            </div>
 
             <AnimatePresence mode="wait">
               {state.is_calculating ? (
